@@ -93,7 +93,7 @@ int main()
 	Assert(c.empty() == false, "B is not empty");
 	c.pop();
 	Assert(c.empty() == true, "B is empty");
-
+	Assert(c != d, "C stringstack does is not equal stringstack d");
 	// TODO: check all methods on StringStack...
 
 	IntList ia{};
@@ -101,6 +101,17 @@ int main()
 	ia.push_front(6);
 	Assert(ia.front() == 6, "front is 6");
 
+	IntList ca { };
+        IntList cb { };
+        ca.push_front(2);
+        Assert(ca.front() == 2, "front == 2");
+        ca.push_front(4);
+        Assert(ca.front() == 4, "front == 4");
+        ca.pop_front();
+        Assert(ca.front() == 2, "front == 2");
+        ca.push_front(5);
+        Assert(ca.front() == 5, "front == 5");
+	Assert(ia != ca, "not equal function");
 	// TODO: check all methods on IntList...
 
 	IntStack ic{};
@@ -108,6 +119,17 @@ int main()
 	ic.push(5);
 	Assert(ic.top() == 5, "top is 5");
 
+	IntStack id {};
+	id.push(12);
+        Assert(id.top() == 12, "front == 12");
+        id.push(24);
+        Assert(id.top() == 24, "front == 24");
+        id.pop();
+        Assert(id.top() == 12, "front == 12");
+        id.push(36);
+        Assert(id.top() == 36, "front == 36");
+	
+	Assert(id != ic, "not equals function");
 	// TODO: check all methods on IntStack...
 
 	return 0;
