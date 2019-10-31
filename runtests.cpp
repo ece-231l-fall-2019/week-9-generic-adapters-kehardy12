@@ -5,20 +5,37 @@
 
 #include <string>
 
-#if 0
+#if 1
 #include "List.h"
+#include "Stack.h"
+#include "Queue.h"
+
 typedef List<std::string> StringList;
 typedef List<int> IntList;
-#include "Stack.h"
+//typedef List<double> DoubleList;
+
 typedef Stack<std::string> StringStack;
 typedef Stack<int> IntStack;
+//typedef Stack<double> DoubleStack;
+
+//typedef Queue<std::string> StringQueue;
+//typedef Queue<int> IntQueue;
+//typedef Queue<double> DoubleQueue;
+
+
 #else
 #include <list>
 typedef std::list<std::string> StringList;
 typedef std::list<int> IntList;
+typedef std::list<double> DoubleList;
 #include <stack>
 typedef std::stack<std::string> StringStack;
 typedef std::stack<int> IntStack;
+typedef std::stack<double> DoubleStack;
+#include <queue>
+typedef std::queue<std::string> StringQueque;
+typedef std::queue<int> IntQueque;
+typedef std::queue<double> DoubleQueue;
 #endif
 
 void Assert(bool cond, std::string message)
@@ -34,8 +51,8 @@ int main()
 	// TODO:
 	// Write more tests to fully test your classes.
 
-	StringList a;
-	StringList b;
+	StringList a{};
+	StringList b{};
 
 	a.push_front("A");
 	Assert(a.front() == "A", "front == A");
@@ -56,8 +73,19 @@ int main()
 	Assert(a.empty() == false, "a is NOT empty");
 
 	// TODO: check all methods on StringList...
+	StringStack d{};
+	StringStack e{};
 
-	StringStack c;
+	d.push("A"); 
+        Assert(d.top() == "A", "front == A");
+        d.push("B");
+        Assert(d.top() == "B", "front == B");
+        d.pop();
+        Assert(d.top() == "A", "front == A");
+        d.push("Z");
+        Assert(d.top() == "Z", "front == Z");
+	
+	StringStack c{};
 	c.push("A");
 	c.push("B");
 	Assert(c.top() == "B", "B is at top");
@@ -68,14 +96,14 @@ int main()
 
 	// TODO: check all methods on StringStack...
 
-	IntList ia;
+	IntList ia{};
 	ia.push_front(5);
 	ia.push_front(6);
 	Assert(ia.front() == 6, "front is 6");
 
 	// TODO: check all methods on IntList...
 
-	IntStack ic;
+	IntStack ic{};
 	ic.push(6);
 	ic.push(5);
 	Assert(ic.top() == 5, "top is 5");

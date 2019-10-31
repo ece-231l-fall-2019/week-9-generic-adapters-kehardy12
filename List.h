@@ -1,108 +1,237 @@
-#ifndef __EE231_List_h__
-#define __EE231_List_h__
-
+#include <iostream>
+#include <string>
+#include <initializer_list>
 #include <cstddef>
 
-template<typename T>
+template <class T>
 class List
 {
+
 	private:
 
+//	size_t _size;
 	typedef struct llist {
-		T val;
-		struct llist *next;
+	T value;
+	struct llist *next;
+	struct llist *prev;
 	} llist;
-
-	llist *_data;
-	size_t _size;
-
-	// private recursive copy so elements
-	// end up in the same order.
-	void reccopy(const llist *ptr)
-	{
-		if (ptr)
-		{
-			reccopy(ptr->next);
-			push_front(ptr->val);
-		}
-	}
-
-	public:
 	
+	llist *_head;
+	llist *_tail;
+	size_t _count;
+	public:
 	// default constructor
-	List()
-	{
-		_data = 0;
-		_size = 0;
-	}
+	List(){
+		_head = 0;
+		_tail = 0;
+		_count = 0;
+	}	
 
 	// copy constructor
-	List(const List& other)
-	{
-		_data = 0;
-		_size = 0;
-		reccopy(other._data);
-	}
+	//List(const List<T>&0 other)
 
-	// destructor
+	List(const std::initializer_list<T>& other)
+	{
+		_head = 0;
+		_tail = 0;
+		_count = 0;
+
+		for (auto value : other)
+			push_back(value);
+	}
+	// deconstructor
 	~List()
 	{
-		clear();
-	}
-
-	// copy operator
-	List& operator=(const List& other)
-	{
-		clear();
-		reccopy(other._data);
-		return *this;
-	}
-
-	void clear()
-	{
-		while(!empty())
+		while (!empty())
 			pop_front();
 	}
-
+	// copy operator
+	
+	List& operator= (const List& a)
+	{
+		for (const llist* b = a._head; b != 0; b = b->next)
+		{
+			push_back(b->value);
+		}
+		return *this;
+	}
+	
 	T& front()
 	{
-		return _data->val;
+		return _head->value;
+	}
+	T& back()
+	{
+		return _tail->value;
 	}
 
 	const T& front() const
 	{
-		return _data->val;
+		return _head->value;
 	}
 
-	void push_front(const T& val)
+	const T& back() const
 	{
-		llist *newItem = new llist;
-		newItem->val = val;
-		newItem->next = _data;
-		_data = newItem;
-		_size++;
+		return _tail->value;
+	}
+
+	void push_front(T value)
+	{
+		llist *ptr = new llist;
+		ptr->value = value;
+
+		ptr->prev = NULL;
+		ptr->next = _head;
+		if (_head != NULL)
+			_head->prev = ptr;
+		if (_tail == NULL)
+			_tail = ptr;
+		_head = ptr;
+		_count++;
+	}
+
+	void push_back (const T value)
+	{ 
+		llist *ptr = new llist;
+		ptr->value = value;
+		ptr->next = NULL;
+		ptr->prev = _tail;
+		if (_tail != NULL)
+			_tail->next = ptr;
+		if (_head == NULL)
+			_head = ptr;
+		_tail = ptr;
+
+		_count++;
 	}
 
 	void pop_front()
 	{
-		llist *front = _data;
-		if (front)
-		{
-			_data = front->next;
-			delete front;
-			_size--;
-		}
+		llist *temp = _head;
+		_head = _head->next;
+		if (_head)
+			_head->prev = _head->prev->prev;
+		else 
+			_tail = NULL;
+		delete temp;
+	}
+	
+	void pop_back ()
+	{
+		llist *temp = _tail;
+		_tail = _tail->prev;
+		if (_tail)
+			_tail->next = _tail->next->next;
+		else 
+			_head = NULL;
+
+		delete temp;
 	}
 
+	void reverse()
+	{
+		if ( size() <= 1)
+			return;
+		llist *newtail = _head;
+		llist *temp;
+		while (newtail != NULL)
+		{
+			temp = newtail->prev;
+			newtail->prev = newtail->next;
+			newtail->next = temp;
+			newtail = newtail->prev;
+		}
+
+		if (temp)
+			temp = temp->prev;
+		_tail = _head;
+		_head = temp;
+	}
+		
 	bool empty() const
 	{
-		return _data == 0;
+		return size() == 0;
 	}
+	
+	void clear()
+	{
+		while (!empty())
+		{
+			pop_back();
+		}
+	}
+	
+	void unique()
+	{
+		for (llist *i = _head; i != 0; i -> next)
+		{
+			while (i->next != 0 && i->value == i->next->value)
+			{
+				llist *save = i->next;
+				i->next = save->next;
 
+				if (save->next != 0)
+				{
+					save->next->prev = i;
+					delete save;
+				}
+				else 
+				{
+					_tail = i;
+					delete save;
+				}
+			}
+		}
+	}
+	
 	size_t size() const
 	{
-		return _size;
-	}
+		size_t count = 0;
+		if (_head == NULL)
+			return count;
+		if (_head == _tail)
+		{
+			count++;
+			return count;
+		}
+		
+		for (llist *temp = _head; temp != NULL;temp= temp->next, count++){}
+
+		return count;
+	}	
+	
+	template <typename V> friend bool operator ==(const List<V>& a, const List<V>& b);
+	
+	template <typename V> friend bool operator !=(const List<V>& a, const List<V>& b);
 };
 
-#endif // __EE231_List_h__
+     template<typename T>
+     bool operator == (const List<T>& a, const List<T>& b){
+             if (a.size() != b.size())
+                     return false;
+             auto *aptr = a._head;
+             auto *bptr = b._head;
+
+             for ( ; aptr != nullptr && bptr != nullptr; aptr = aptr->next , bptr = bptr -> next)
+             {
+                     if (aptr -> value != bptr -> value)
+                             return false;
+             }
+             return true;
+     }
+
+     template<typename T>
+     bool operator != (const List<T>& a, const List<T>& b){
+             if (a.size() != b.size())
+                     return true;
+             
+	     auto *aptr = a._head;
+             auto *bptr = b._head;
+
+             for ( ; aptr != nullptr && bptr != nullptr; aptr = aptr->next , bptr = bptr -> next)
+             {
+                     if (aptr -> value != bptr -> value)
+                             return true;
+	     }
+             return false;
+     }
